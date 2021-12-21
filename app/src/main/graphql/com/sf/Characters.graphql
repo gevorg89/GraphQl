@@ -7,6 +7,7 @@ query CharactersQuery($page:Int!, $name: String!) {
             prev
         }
         results {
+            id
             name
             image
         }

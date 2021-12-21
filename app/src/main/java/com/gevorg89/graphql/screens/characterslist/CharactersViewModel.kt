@@ -1,10 +1,11 @@
-package com.gevorg89.graphql.screens
+package com.gevorg89.graphql.screens.characterslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.gevorg89.graphql.screens.characterslist.CharactersPaging
 
 class CharactersViewModel : ViewModel() {
 

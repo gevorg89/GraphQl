@@ -1,4 +1,4 @@
-package com.gevorg89.graphql.screens
+package com.gevorg89.graphql.screens.characterslist
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

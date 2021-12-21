@@ -1,6 +1,7 @@
-package com.gevorg89.graphql.screens
+package com.gevorg89.graphql.screens.characterslist
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +24,8 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun CharactersScreen(
     charactersPaging: Flow<PagingData<CharactersQuery.Result>>,
-    invalidateSearch: (String) -> Unit
+    invalidateSearch: (String) -> Unit,
+    showCharacter: (CharactersQuery.Result) -> Unit
 ) {
     var item by remember {
         mutableStateOf<CharactersQuery.Data?>(null)
@@ -35,7 +37,7 @@ fun CharactersScreen(
         Search(text) {
             text = it
         }
-        Characters(pagingItems)
+        Characters(pagingItems = pagingItems, showCharacter = showCharacter)
     }
 
     LaunchedEffect(key1 = text, block = {
@@ -43,8 +45,6 @@ fun CharactersScreen(
         searchScope.launch {
             delay(400)
             invalidateSearch(text)
-            //pagingItems.refresh()
-            //item = ApolloClientTest.characters(text)
         }
     })
 }
@@ -58,12 +58,15 @@ fun Search(text: String, onValueChange: (String) -> Unit) {
 
 @Composable
 fun Characters(
-    pagingItems: LazyPagingItems<CharactersQuery.Result>
+    pagingItems: LazyPagingItems<CharactersQuery.Result>,
+    showCharacter: (CharactersQuery.Result) -> Unit
 ) {
     LazyColumn {
         items(pagingItems) { character ->
             character?.let {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showCharacter(character) }) {
                     Image(
                         painter = rememberImagePainter(data = character.image),
                         contentDescription = null,
