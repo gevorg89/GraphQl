@@ -1,7 +1,10 @@
-query CharactersQuery($name: String!) {
-    characters(page: 0, filter: {name: $name}) {
+query CharactersQuery($page:Int!, $name: String!) {
+    characters(page: $page, filter: {name: $name}) {
         info {
             count
+            next
+            pages
+            prev
         }
         results {
             name

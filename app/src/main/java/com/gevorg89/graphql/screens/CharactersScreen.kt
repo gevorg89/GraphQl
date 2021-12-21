@@ -6,38 +6,45 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import coil.compose.rememberImagePainter
-import com.gevorg89.graphql.ApolloClientTest
 import com.sf.CharactersQuery
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun CharactersScreen() {
+fun CharactersScreen(
+    charactersPaging: Flow<PagingData<CharactersQuery.Result>>,
+    invalidateSearch: (String) -> Unit
+) {
     var item by remember {
         mutableStateOf<CharactersQuery.Data?>(null)
     }
     var text by remember { mutableStateOf("") }
+    val pagingItems = charactersPaging.collectAsLazyPagingItems()
     val searchScope = remember { CoroutineScope(Dispatchers.IO) }
     Column {
         Search(text) {
             text = it
         }
-        item?.characters?.results?.let {
-            Characters(it)
-        }
+        Characters(pagingItems)
     }
 
     LaunchedEffect(key1 = text, block = {
         searchScope.coroutineContext.cancelChildren()
         searchScope.launch {
             delay(400)
-            item = ApolloClientTest.characters(text)
+            invalidateSearch(text)
+            //pagingItems.refresh()
+            //item = ApolloClientTest.characters(text)
         }
     })
 }
@@ -50,9 +57,11 @@ fun Search(text: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun Characters(results: List<CharactersQuery.Result?>) {
+fun Characters(
+    pagingItems: LazyPagingItems<CharactersQuery.Result>
+) {
     LazyColumn {
-        items(results) { character ->
+        items(pagingItems) { character ->
             character?.let {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Image(
