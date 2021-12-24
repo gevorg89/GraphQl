@@ -1,0 +1,17 @@
+query LocationQuery($locationId: ID!) {
+    location(id: $locationId) {
+        name
+        created
+        dimension
+        id
+        type
+        residents {
+            image
+            name
+            episode {
+                name
+                id
+            }
+        }
+    }
+}
